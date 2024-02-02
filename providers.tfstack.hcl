@@ -6,14 +6,9 @@ required_providers {
     source  = "hashicorp/google"
     version = "~> 5.12.0"
   }
-
-  http = {
-    source  = "hashicorp/http"
-    version = "~> 3.4.1"
-  }
 }
 
-provider "google" "this" {
+provider "google" "default" {
   config {
     project = var.gcp_project_id
     region  = var.gcp_region
@@ -32,5 +27,3 @@ provider "google" "this" {
     )
   }
 }
-
-provider "http" "this" {}

@@ -6,9 +6,8 @@ identity_token "gcp" {
   audience = ["<Set to your GCP token audience>"]
 }
 
-deployment "production" {
+deployment "dev" {
   variables = {
-    public_ssh_key_url         = "<Set to a URL where your public SSH key can be read. Used for compute instance login auth>"
     identity_token_file        = identity_token.gcp.jwt_filename
     gcp_audience               = "<Set to your GCP token audience>"
     gcp_service_account_email  = "<Set to your GCP service account email>"

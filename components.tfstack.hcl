@@ -1,15 +1,25 @@
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
-component "compute" {
-  source = "./compute"
-
+component "common" {
+  source = "./01-common"
   inputs = {
-    public_ssh_key_url = var.public_ssh_key_url
+    project_id = var.project_id
+    region     = var.region
+  }
+  providers = {
+    google = provider.google.default
   }
 
+}
+
+
+component "compute" {
+  source = "./04-compute"
+  inputs = {
+#    public_ssh_key_url = var.public_ssh_key_url
+  }
   providers = {
-    google = provider.google.this
-    http   = provider.http.this
+    google = provider.google.default
   }
 }

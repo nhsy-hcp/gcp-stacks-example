@@ -1,19 +1,15 @@
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
-data "http" "ssh_key" {
-  url = var.public_ssh_key_url
-}
-
 data "google_compute_image" "my_image" {
   family  = "debian-11"
   project = "debian-cloud"
 }
 
 resource "google_compute_instance" "default" {
-  name         = "example-instance"
-  machine_type = "e2-medium"
-  zone         = "us-central1-a"
+  name         = "${var.instance_name_prefix}-${var.unique_id}"
+  machine_type = var.machine_type
+  zone         = var.zone
 
   boot_disk {
     initialize_params {
@@ -28,11 +24,12 @@ resource "google_compute_instance" "default" {
     }
   }
 
-  metadata = {
-    ssh-keys = "user:${data.http.ssh_key.response_body}"
-  }
+#  metadata = {
+#    ssh-keys = "user:${data.http.ssh_key.response_body}"
+#  }
 
   service_account {
+    email  = var.service_account_email
     scopes = ["userinfo-email", "compute-ro", "storage-ro"]
   }
 }
