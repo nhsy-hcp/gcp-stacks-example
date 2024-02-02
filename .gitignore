@@ -1,0 +1,32 @@
+### Terraform template
+# Local .terraform directories
+**/.terraform/*
+**/.terraform.lock.hcl
+**/.terragrunt-cache/*
+.terraform
+
+# Local dev files
+.config
+.idea
+.kube
+.ssh
+.terragrunt-cache
+
+# Terraform state
+**/terraform.tfstate.d/*
+*.tfstate
+*.tfstate.*
+
+# Terraform plan
+*.plan
+
+# Terraform local tfvars
+terraform.tfvars
+
+.DS_Store
+*.bak
+consul-license.yaml*
+consul-admin-cluster.tf
+
+vault-init.json
+argocd/*/*-application.yaml

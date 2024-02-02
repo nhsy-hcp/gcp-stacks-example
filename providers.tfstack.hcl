@@ -6,31 +6,29 @@ required_providers {
     source  = "hashicorp/google"
     version = "~> 5.12.0"
   }
-
-  http = {
-    source  = "hashicorp/http"
-    version = "~> 3.4.1"
+  random = {
+    source  = "hashicorp/random"
+    version = "~> 3.0"
   }
 }
 
-provider "google" "this" {
+provider "random" "default" {}
+
+provider "google" "default" {
   config {
-    project = var.gcp_project_id
-    region  = var.gcp_region
-    zone    = var.gcp_zone
+    project = var.project_id
+    region  = var.region
     credentials = jsonencode(
       {
         "type": "external_account",
-        "audience": var.gcp_audience,
-        "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+        "audience": var.audience,
+        "subject_token_type": "urn:ietf:params:oauth:token-type:jwt"
         "token_url": "https://sts.googleapis.com/v1/token",
         "credential_source": {
           "file": var.identity_token_file
         },
-        "service_account_impersonation_url": format("https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/%s:generateAccessToken", var.gcp_service_account_email)
+        "service_account_impersonation_url": format("https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/%s:generateAccessToken", var.service_account_email)
       }
     )
   }
 }
-
-provider "http" "this" {}
