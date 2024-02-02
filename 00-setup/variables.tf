@@ -31,3 +31,17 @@ variable "gcp_project_id" {
   type        = string
   description = "The ID for your GCP project"
 }
+variable "service_account_id" {
+  type        = string
+  default = "gcp-stacks-example"
+}
+
+variable "workload_identity_pool_id" {
+    type        = string
+  default = "wi-pool-gcp-stacks-example"
+}
+
+variable "workload_identity_pool_provider_id" {
+    type        = string
+  default = "wi-provider-gcp-stacks-example"
+}
