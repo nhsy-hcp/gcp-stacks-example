@@ -6,6 +6,10 @@ output "service_account_email" {
   value = google_service_account.tfc.email
 }
 
-#output "audience" {
-#  value = google_iam_workload_identity_pool_provider.tfc.oidc[0].allowed_audiences[0]
-#}
+output project_id {
+  value = data.google_project.current.id
+}
+
+output project_number {
+  value = data.google_project.current.number
+}
