@@ -38,7 +38,7 @@ resource "google_iam_workload_identity_pool_provider" "tfc" {
   workload_identity_pool_provider_id = var.workload_identity_pool_provider_id
   attribute_mapping = {
     "google.subject"                            = "assertion.sub",
-    "attribute.aud"                             = "type(assertion.aud) == list ? assertion.aud[0] : assertion.aud",
+    "attribute.aud"                             = "assertion.aud"
     "attribute.terraform_operation"             = "assertion.terraform_operation",
     "attribute.terraform_stack_deployment_name" = "assertion.terraform_stack_deployment_name",
     "attribute.terraform_stack_id"              = "assertion.terraform_stack_id",
@@ -50,16 +50,13 @@ resource "google_iam_workload_identity_pool_provider" "tfc" {
     "attribute.terraform_plan_id"               = "assertion.terraform_plan_id"
   }
   oidc {
-    issuer_uri = "https://${var.tfc_hostname}"
-    # The default audience format used by TFC is of the form:
-    # //iam.googleapis.com/projects/{project number}/locations/global/workloadIdentityPools/{pool ID}/providers/{provider ID}
-    # which matches with the default accepted audience format on GCP.
-    #
-    # Uncomment the line below if you are specifying a custom value for the audience instead of using the default audience.
-    #allowed_audiences = [var.tfc_gcp_audience]
+    issuer_uri        = "https://${var.tfc_hostname}"
+    allowed_audiences = [var.tfc_gcp_audience]
   }
   # Example subject format: organization:org-RCDSHBfLu9e1e8oZ:project:prj-KRWRrGi7hfnznL59:stack:st-qNWJBTiZZrzfYWiC:deployment:staging:operation:apply
-  attribute_condition = "assertion.sub.startsWith(\"organization:${data.tfe_organization.default.id}:project:${tfe_project.default.id}\")"
+  # attribute_condition = "assertion.sub.startsWith(\"organization:${data.tfe_organization.default.id}:project:${tfe_project.default.id}\")"
+  attribute_condition = "assertion.sub.startsWith(\"organization:${var.tfc_organization_name}:project:${tfe_project.default.name}:stack\")"
+  # attribute_condition = "assertion.aud == \"${var.tfc_gcp_audience}\""
 
   lifecycle {
     prevent_destroy = true
@@ -84,6 +81,7 @@ resource "google_service_account_iam_member" "tfc" {
   service_account_id = google_service_account.tfc.id
   role               = each.value
   member             = "principalSet://iam.googleapis.com/projects/${data.google_project.current.number}/locations/global/workloadIdentityPools/${var.workload_identity_pool_id}/attribute.terraform_project_id/${tfe_project.default.id}"
+  # member = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.tfc.name}/*"
 
   depends_on = [
     google_iam_workload_identity_pool_provider.tfc

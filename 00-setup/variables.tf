@@ -1,6 +1,6 @@
 variable "tfc_gcp_audience" {
   type        = string
-  default     = ""
+  default     = "hcp.workload.identity"
   description = "The audience value to use in run identity tokens if the default audience value is not desired."
 }
 

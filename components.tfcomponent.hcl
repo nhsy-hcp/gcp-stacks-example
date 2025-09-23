@@ -42,7 +42,7 @@ component "network" {
       subnet_flow_logs_sampling = 0.7
       subnet_flow_logs_metadata = "INCLUDE_ALL_METADATA"
     }
-    unique_id  = component.common.unique_id
+    unique_id = component.common.unique_id
   }
   providers = {
     google = provider.google.default
