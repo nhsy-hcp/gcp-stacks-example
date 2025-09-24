@@ -13,5 +13,5 @@ deployment "us-central1" {
     service_account_email = "gcp-stacks-example@hc-74e3c710d01c46ee9c3abb2fa31.iam.gserviceaccount.com"
     region                = "us-central1"
   }
-  # destroy = true
+  destroy = true
 }
