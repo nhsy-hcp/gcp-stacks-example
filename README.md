@@ -9,18 +9,15 @@ The following Google Cloud resources are created:
 - Service Account
 - VPC Network
 
-
 ## Prerequisites
 - GitHub Repository
 - Google Cloud project with owner IAM permissions
 - Terraform Cloud organisation
 - terraform CLI 
-- tfstacks CLI 
 
 CLI tools can be installed using the following commands documented at https://github.com/hashicorp/homebrew-tap:
 ```bash
 brew install hashicorp/tap/terraform
-brew install hashicorp/tap/tfstacks
 ```
 
 ## Initial setup
@@ -39,17 +36,6 @@ terraform init
 terraform plan
 terraform apply
 ```
-Once applied successfully the output should display the values required for the next step.
-```shell
-Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
-
-Outputs:
-
-audience = "//iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/wi-pool-gcp-stacks-example/providers/wi-provider-gcp-stacks-example"
-project_id = "prj-123456789"
-project_number = "123456789"
-service_account_email = "gcp-stacks-example@prj-123456789.iam.gserviceaccount.com"
-```
 
 Update `deployments.tfdeploy.hcl` with the required values for:
 * audience
@@ -57,17 +43,13 @@ Update `deployments.tfdeploy.hcl` with the required values for:
 * service_account_email
 
 ```hcl
-identity_token "gcp" {
-  audience = ["//iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/wi-pool-gcp-stacks-example/providers/wi-provider-gcp-stacks-example"]
-}
-
 deployment "us-central1" {
-  variables = {
-    audience               = "//iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/wi-pool-gcp-stacks-example/providers/wi-provider-gcp-stacks-example"
-    identity_token_file    = identity_token.gcp.jwt_filename
-    project_id             = "prj-1234567890"
-    service_account_email  = "gcp-stacks-example@prj-123456789.iam.gserviceaccount.com"
-    region                 = "us-central1"
+  inputs = {
+    identity_token        = identity_token.gcp.jwt
+    audience              = "//iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/wi-pool-gcp-stacks-example/providers/wi-provider-gcp-stacks-example"
+    project_id            = "prj-123456789"
+    service_account_email = "gcp-stacks-example@prj-123456789.iam.gserviceaccount.com"
+    region                = "us-central1"
   }
 }
 ```
