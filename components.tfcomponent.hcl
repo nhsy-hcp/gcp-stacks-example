@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 component "common" {
-  source = "./01-common"
+  source = "./modules/common"
   inputs = {
     project_id = var.project_id
     region     = var.region
@@ -14,7 +14,7 @@ component "common" {
 }
 
 component "project" {
-  source = "./02-project"
+  source = "./modules/project"
   inputs = {
     project_id = var.project_id
     unique_id  = component.common.unique_id
@@ -25,7 +25,7 @@ component "project" {
 }
 
 component "network" {
-  source = "./03-network"
+  source = "./modules/network"
   inputs = {
     network_name    = format("%s-%s", "vpc", component.common.unique_id)
     project_id      = var.project_id
@@ -50,7 +50,7 @@ component "network" {
 }
 
 component "compute" {
-  source = "./04-compute"
+  source = "./modules/compute"
   inputs = {
     compute_sa_email     = component.project.compute_sa_email
     subnetwork_self_link = component.network.subnet_self_link
