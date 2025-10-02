@@ -9,6 +9,17 @@ The following Google Cloud resources are created:
 - Service Account
 - VPC Network
 
+### Modules
+The infrastructure is organized into reusable Terraform modules in the `modules/` directory:
+
+- `modules/common` - Generates random string IDs and retrieves common GCP data (zones, project info)
+- `modules/compute` - Creates GCP Compute Engine instances with Debian images
+- `modules/network` - Creates VPC networks, subnets, firewall rules, cloud routers, and NAT gateways
+- `modules/project` - Manages project-level configuration including API enablement, service accounts, and IAM roles
+
+### Bootstrap
+The `bootstrap/` directory contains Terraform configuration to set up the initial Terraform Cloud workspace and GCP project prerequisites.
+
 ## Prerequisites
 - GitHub Repository
 - Google Cloud project with owner IAM permissions
@@ -23,7 +34,7 @@ brew install hashicorp/tap/terraform
 ## Initial setup
 Fork the repository to your own GitHub account.
 
-Add the `00-setup/terraform.tfvars` file with the required values.
+Add the `bootstrap/terraform.tfvars` file with the required values.
 ```bash
 tfc_organization_name = "org name"
 gcp_project_id        = "project id"
@@ -31,7 +42,7 @@ gcp_project_id        = "project id"
 
 Bootstrap the Terraform Cloud workspace and GCP Project with the following commands:
 ```bash
-cd 00-setup
+cd bootstrap
 terraform init
 terraform plan
 terraform apply
@@ -68,5 +79,30 @@ Click on the deployment `us-central1`.
 
 Click on the latest plan, e.g. `Plan 1` and click `Approve Plan`.
 
+## Connecting to the Compute Instance
+
+After the deployment completes, you can SSH into the Google Compute Engine instance using the `ssh_command` output. View the outputs in the Terraform Cloud stack, copy the SSH command, and run it in your terminal:
+
+```bash
+gcloud compute ssh <instance-name> --zone=<zone> --tunnel-through-iap
+```
+
+This command uses Identity-Aware Proxy (IAP) to establish a secure tunnel to the instance without requiring a public IP address.
+
 ## Cleanup
-To remove the resources created select the `Destruction and Deletion` option in the Terraform Cloud stack and select `Create destroy plan`.
+To remove the resources created, uncomment the `destroy = true` line in the `deployments.tfdeploy.hcl` file:
+
+```hcl
+deployment "us-central1" {
+  inputs = {
+    identity_token        = identity_token.gcp.jwt
+    audience              = "//iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/wi-pool-gcp-stacks-example/providers/wi-provider-gcp-stacks-example"
+    project_id            = "prj-123456789"
+    service_account_email = "gcp-stacks-example@prj-123456789.iam.gserviceaccount.com"
+    region                = "us-central1"
+  }
+  destroy = true
+}
+```
+
+Commit and push the changes to trigger a destroy plan in Terraform Cloud.
